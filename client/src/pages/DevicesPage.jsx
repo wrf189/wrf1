@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { RiComputerLine, RiAddLine, RiSearchLine } from "react-icons/ri";
 import TableDevice from "../components/table/TableDevice";
 import useMod from "../hooks/useMod";
 import CreateDeviceMod from "../mods/CreateDeviceMod";
@@ -13,7 +14,6 @@ const DevicesPage = () => {
 
   const handleAddDevice = (newDevice) => {
     setDevices((prevDevices) => [...prevDevices, newDevice]);
-    // Toggle refreshData to trigger a re-fetch in TableDevice
     setRefreshData((prev) => !prev);
     handleCloseModal("createDevice");
   };
@@ -29,70 +29,80 @@ const DevicesPage = () => {
         device.id === updatedDevice.id ? updatedDevice : device
       )
     );
-    // Toggle refreshData to trigger a re-fetch in TableDevice
     setRefreshData((prev) => !prev);
     handleCloseModal("updateDevice");
   };
 
   const handleDeleteDevice = (deviceId) => {
-    // Remove device from local state if needed
     setDevices((prevDevices) =>
       prevDevices.filter((device) => device.id !== deviceId)
     );
-    // Toggle refreshData to trigger a re-fetch in TableDevice
     setRefreshData((prev) => !prev);
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const clearSearch = () => {
-    setSearchTerm("");
-  };
-
   return (
-    <div className="w-full h-fit min-h-screen bg-gray-100 p-6 flex flex-col gap-6">
-      <p className="text-2xl font-bold">Management Perangkat</p>
-      <div className="w-full h-full bg-white rounded-3xl shadow-lg p-5 flex flex-col gap-5">
-        <div className="w-full flex items-center justify-end gap-5">
-          <div className="relative w-1/3">
-            <input
-              type="text"
-              placeholder="Cari berdasarkan hostname..."
-              className="w-full border border-gray-300 rounded-full px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-            {searchTerm && (
-              <button
-                onClick={clearSearch}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            )}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="w-full p-8 space-y-8">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+            <RiComputerLine className="w-6 h-6 text-white" />
           </div>
-          <button
-            className="bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-full cursor-pointer transition-colors duration-200"
-            onClick={() => handleOpenModal("createDevice")}
-          >
-            Tambah Perangkat
-          </button>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Devices Management</h1>
+          </div>
         </div>
-        <div className="w-full h-full">
-          <TableDevice
-            data={devices}
-            refreshData={refreshData}
-            onDeleteDevice={handleDeleteDevice}
-            onEditDevice={handleEditDevice}
-            searchTerm={searchTerm}
-          />
+
+        {/* Main Content */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          {/* Header with Actions */}
+          <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Devices List</h2>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                {/* Search Bar */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <RiSearchLine className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search Hostname..."
+                    className="block w-full sm:w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                
+                {/* Add Device Button */}
+                <button
+                  onClick={() => handleOpenModal("createDevice")}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                >
+                  <RiAddLine className="w-4 h-4" />
+                  Add New Device
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Table Container */}
+          <div className="p-8">
+            <TableDevice
+              data={devices}
+              refreshData={refreshData}
+              onDeleteDevice={handleDeleteDevice}
+              onEditDevice={handleEditDevice}
+              searchTerm={searchTerm}
+            />
+          </div>
         </div>
       </div>
 
+      {/* Modals */}
       {modals.createDevice && (
         <CreateDeviceMod
           onClose={() => handleCloseModal("createDevice")}

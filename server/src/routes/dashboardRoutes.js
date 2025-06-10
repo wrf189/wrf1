@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.use(authenticateToken);
 
-router.get("/", authorizeRoles("admin"), getDashboardData);
+router.get("/", authorizeRoles("admin","user"), getDashboardData);
 
 export default router;

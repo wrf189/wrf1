@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { RiComputerFill } from "react-icons/ri";
+import { RiComputerFill, RiAlarmWarningFill, RiShieldCheckFill, RiErrorWarningFill } from "react-icons/ri";
 import { API_URL } from "../utils/constantApi";
 import TableOlt from "../components/table/TableOlt";
 
@@ -68,46 +68,78 @@ const MonitoringPage = () => {
   const dashboardData = [
     {
       title: "OLT Congestion",
-      quantity: oltApiNisa?.total,
+      quantity: oltApiNisa?.total || 0,
+      icon: RiAlarmWarningFill,
+      bgColor: "bg-orange-500", // Oranye untuk peringatan congestion
     },
     {
-      title: "OLT Need Redudancy",
+      title: "OLT Need Redundancy",
       quantity: redundancyCount,
+      icon: RiShieldCheckFill,
+      bgColor: "bg-blue-500", // Biru untuk redundancy/backup
     },
     {
-      title: "Link Down",
+      title: "OLT Down",
       quantity: 5,
+      icon: RiErrorWarningFill,
+      bgColor: "bg-red-500", // Merah untuk status down/error
     },
   ];
 
   return (
-    <div className="w-full h-full min-h-screen bg-gray-100 p-6 flex flex-col gap-6">
-      <p className="text-2xl font-bold">Management Monitoring</p>
-      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {dashboardData.map((device, index) => (
-          <div
-            key={index}
-            className="w-full bg-white rounded-2xl shadow-md p-5 flex items-center gap-4 transition duration-300 hover:shadow-xl"
-          >
-            <div className="w-16 h-16 rounded-full flex items-center justify-center transition duration-300">
-              <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center transition duration-300">
-                <RiComputerFill className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <p className="text-lg font-semibold">{device.title}</p>
-              <div className="flex items-center gap-2">
-                <span className="text-gray-500 text-sm">
-                  {device.quantity}
-                </span>
-                <p className="text-gray-500 text-sm">Devices</p>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="w-full p-8 space-y-8">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+            <RiComputerFill className="w-6 h-6 text-white" />
           </div>
-        ))}
-      </div>
-      <div className="w-full h-full shadow-md bg-white rounded-2xl p-5">
-        <TableOlt dataOlt={oltApiNisa} />
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Monitoring</h1>
+            <p className="text-gray-600 mt-1">OLT Congested Monitoring Dashboard</p>
+          </div>
+        </div>
+
+        {/* Metric Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {dashboardData.map((device, index) => {
+            const IconComponent = device.icon;
+            return (
+              <div
+                key={index}
+                className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100"
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-16 h-16 rounded-xl ${device.bgColor} flex items-center justify-center shadow-lg`}>
+                    <IconComponent className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      {device.title}
+                    </h3>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold text-gray-900">
+                        {device.quantity}
+                      </span>
+                      <span className="text-sm text-gray-500">Devices</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Table Section */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <h2 className="text-xl font-semibold text-gray-900">OLT Device Status</h2>
+            <p className="text-gray-600 mt-1">Overview of all OLT Congestion device</p>
+          </div>
+          <div className="p-8">
+            <TableOlt dataOlt={oltApiNisa} />
+          </div>
+        </div>
       </div>
     </div>
   );

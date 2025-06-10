@@ -65,19 +65,19 @@ export const login = async (req, res) => {
     if (!email || !password) {
       return res
         .status(400)
-        .json({ message: "Email dan password wajib diisi" });
+        .json({ message: "Email and password are required"});
     }
 
     // Cari user berdasarkan email
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(400).json({ message: "Email tidak ditemukan" });
+      return res.status(400).json({ message: "Email not found" });
     }
 
     // Cek kecocokan password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Password salah" });
+      return res.status(400).json({ message: "Wrong password" });
     }
 
     // Generate token
