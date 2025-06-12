@@ -9,6 +9,7 @@ const MonitoringPage = () => {
   const [oltApiNisa, setOltApiNisa] = useState([]);
   const [deviceData, setDeviceData] = useState([]);
   const [redundancyCount, setRedundancyCount] = useState(0);
+  const [statusCount, setStatusCount] = useState(0);
 
   const fetchOltData = async () => {
     try {
@@ -60,9 +61,27 @@ const MonitoringPage = () => {
     }
   };
 
+    const fetchStatusDevice = async () => {
+    const token = Cookies.get("token");
+    try {
+      const response = await axios.get(`${API_URL}/devices`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setDeviceData(response.data.devices);
+
+      const count = response.data.devices.filter(
+        (d) => d.status === "offline"
+      ).length;
+      setStatusCount(count);
+    } catch (error) {
+      console.error("Error fetching devices:", error);
+    }
+  };
+
   useEffect(() => {
     fetchOltData();
     fetchDevice();
+    fetchStatusDevice();
   }, []);
 
   const dashboardData = [
@@ -80,7 +99,7 @@ const MonitoringPage = () => {
     },
     {
       title: "OLT Down",
-      quantity: 5,
+      quantity: statusCount,
       icon: RiErrorWarningFill,
       bgColor: "bg-red-500", // Merah untuk status down/error
     },
