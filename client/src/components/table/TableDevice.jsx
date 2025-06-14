@@ -136,9 +136,7 @@ const TableDevice = ({ refreshData, onDeleteDevice, onEditDevice, searchTerm = "
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                  <div className="flex items-center gap-2">
-                    <span>No</span>
-                  </div>
+                  No
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                   Device
@@ -193,7 +191,10 @@ const TableDevice = ({ refreshData, onDeleteDevice, onEditDevice, searchTerm = "
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-600 font-medium">
-                        {device.location || 'No location'}
+                        <span className={searchTerm && device.hostname?.toLowerCase().includes(searchTerm.toLowerCase()) 
+                          ? "bg-yellow-200 px-1 rounded" : ""}>
+                          {device.location || 'No location'}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

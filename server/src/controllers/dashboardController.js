@@ -18,7 +18,7 @@ export const getDashboardData = async (req, res) => {
     });
 
     const devicesData = [
-      { title: "Total Perangkat", quantity: (oltCount + totalPerangkat.length) },
+      { title: "Total Devices", quantity: (oltCount + totalPerangkat.length) },
       { title: "Kabupaten/Kota", quantity: uniqueLocations.length },
       { title: "OLT", quantity: oltCount },
     ];

@@ -11,38 +11,14 @@ const MonitoringPage = () => {
   const [redundancyCount, setRedundancyCount] = useState(0);
   const [statusCount, setStatusCount] = useState(0);
 
-  const fetchOltData = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("username", "wangsa.fatahillah");
-      formData.append("password", "e0c9fcfd8400dd6898379e977292047b");
-
-      const loginRes = await axios.post(
-        "https://apicore.oss.myrepublic.co.id/authenticate/login",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      const token = loginRes.data?.data?.access_token;
-      if (!token) throw new Error("Failed to get login token");
-
-      const oltRes = await axios.get(
-        "https://apinisa.oss.myrepublic.co.id/api/referential/datalink/olt",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        }
-      );
-
-      setOltApiNisa(oltRes.data);
-    } catch (error) {
-      console.error("Error fetching OLT data:", error);
-    }
-  };
+const fetchOltData = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/proxy/olt-monitoring`);
+    setOltApiNisa(res.data);
+  } catch (error) {
+    console.error("Error fetching OLT data via proxy:", error);
+  }
+};
 
   const fetchDevice = async () => {
     const token = Cookies.get("token");

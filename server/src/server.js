@@ -7,6 +7,7 @@ import deviceRoutes from "./routes/deviceRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import topologiRoutes from "./routes/topologiRoutes.js";
 import subDeviceRoutes from "./routes/subDeviceRoutes.js";
+import oltProxyRoutes from "./routes/oltProxyRoutes.js";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/api/devices", deviceRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/topologi", topologiRoutes)
 app.use("/api/sub-device", subDeviceRoutes);
+app.use("/api/proxy", oltProxyRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

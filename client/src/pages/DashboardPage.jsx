@@ -41,7 +41,7 @@ const DashboardPage = () => {
           Dashboard
         </h1>
         <p className="text-gray-600 mt-1 text-base">
-          Welcome to MyRepublic OLT Network Topology
+          Welcome to MyRepublic OLT Network Topology & Congestion Monitoring System
         </p>
       </div>
 
@@ -52,7 +52,7 @@ const DashboardPage = () => {
             <div className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-blue-400 rounded-full animate-ping"></div>
           </div>
           <p className="text-xl font-semibold text-gray-400 mt-6 animate-pulse">
-            Memuat data...
+            Load data...
           </p>
         </div>
       ) : (
@@ -62,7 +62,7 @@ const DashboardPage = () => {
             <div className="w-full">
               <div className="mb-4">
                 <h2 className="text-2xl font-bold text-gray-800 mb-1">
-                  Informasi User
+                  Account Information
                 </h2>
                 <div className="w-16 h-0.5 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
               </div>
@@ -114,7 +114,7 @@ const DashboardPage = () => {
           <div className="w-full">
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-gray-800 mb-1">
-                Informasi Perangkat
+                Devices Information
               </h2>
               <div className="w-16 h-0.5 bg-gradient-to-r from-green-500 to-teal-500 rounded-full"></div>
             </div>
