@@ -25,7 +25,7 @@ const CreateUserMod = ({ onClose, onCreated }) => {
     const token = Cookies.get("token");
     
     try {
-      const response = await axios.post(`${API_URL}/users`, formData, {
+      const response = await axios.post(`${API_URL}/auth/register`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

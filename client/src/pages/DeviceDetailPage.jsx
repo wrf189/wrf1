@@ -7,11 +7,12 @@ import { API_URL } from "../utils/constantApi";
 import TableSubDevice from "../components/table/TableSubDevice";
 import useMod from "../hooks/useMod";
 import CreateSubDeviceMod from "../mods/CreateSubDeviceMod";
+import UpdateSubDeviceMod from "../mods/UpdateSubDeviceMod";
 
 const DeviceDetailPage = () => {
   const id = window.location.pathname.split("/")[3];
   const [device, setDevice] = useState({});
-  const { modals, handleOpenModal, handleCloseModal } = useMod();
+  const { modals, handleOpenModal, handleCloseModal, selectdItem } = useMod();
   const [refreshData, setRefreshData] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -19,6 +20,16 @@ const DeviceDetailPage = () => {
     getDeviceById(); // Fetch data ulang dari backend
     setRefreshData((prev) => !prev);
     handleCloseModal("createDevice");
+  };
+
+  const handleEditSubDevice = (subDevice) => {
+    handleOpenModal("updateSubDevice", subDevice);
+  };
+
+  const handleUpdatedSubDevice = () => {
+    getDeviceById(); // jika ingin update detail device juga
+    setRefreshData((prev) => !prev); // untuk trigger re-fetch table subdevice
+    handleCloseModal("updateSubDevice");
   };
 
   const getDeviceById = async () => {
@@ -75,7 +86,11 @@ const DeviceDetailPage = () => {
           </button>
         </div>
         <div className="w-full h-full">
-          <TableSubDevice refreshData={refreshData} searchTerm={searchTerm} />
+          <TableSubDevice
+            refreshData={refreshData}
+            searchTerm={searchTerm}
+            onEditSubDevice={handleEditSubDevice}
+          />
         </div>
       </div>
 
@@ -84,6 +99,14 @@ const DeviceDetailPage = () => {
           onClose={() => handleCloseModal("createSubDevice")}
           onCreated={handleAddSubDevice}
           id={id}
+        />
+      )}
+
+      {modals.updateSubDevice && selectdItem && (
+        <UpdateSubDeviceMod
+          onClose={() => handleCloseModal("updateSubDevice")}
+          item={selectdItem}
+          onUpdated={handleUpdatedSubDevice}
         />
       )}
     </div>

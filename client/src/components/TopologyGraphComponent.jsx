@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Network } from "vis-network/standalone/esm/vis-network";
 import PortInfoMod from "../mods/PortInfoMod";
 
-const TopologyGraphComponent = ({ uplink, data }) => {
+const TopologyGraphComponent = ({ uplink, data, oltReference }) => {
   const containerRef = useRef(null);
 
   console.log("Data:", data);
+  console.log("OLT Reference:", oltReference);
 
   const [popupData, setPopupData] = useState(null);
 
@@ -39,10 +40,10 @@ const TopologyGraphComponent = ({ uplink, data }) => {
         Array.isArray(device.subDevices)
           ? device.subDevices.map((sub) => ({
               id: sub.id,
-              label: `${sub.subdevicename || "SubDevice"}\nPort: ${
-                sub.portsubdevice || "-"
+              label: `${sub.subdevicename || "SubDevice"}\n ${
+                sub.hostname || "-"
               }`,
-              shape: "circle",
+              shape: "ellipse",
               color: "#ffc107",
               font: { size: 12 },
               level: 2, // Level 2 untuk subdevices
@@ -125,10 +126,10 @@ const TopologyGraphComponent = ({ uplink, data }) => {
             id: `sub-${sub.id}`,
             from: device.id,
             to: sub.id,
-            arrows: "to",
-            color: { color: "#17a2b8" },
+            // arrows: "to",
+            color: { color: "#999" },
             font: { align: "middle" },
-            dashes: true,
+            dashes: false,
             smooth: {
               type: "curvedCW",
               roundness: 0.15,

@@ -4,7 +4,7 @@ import axios from "axios";
 import { API_URL } from "../../utils/constantApi";
 import Cookies from "js-cookie";
 
-const TableSubDevice = ({ refreshData, searchTerm }) => {
+const TableSubDevice = ({ refreshData, searchTerm, onEditSubDevice }) => {
   const [subDeviceList, setSubDeviceList] = useState([]);
   const [filteredSubDeviceList, setFilteredSubDeviceList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +53,11 @@ const TableSubDevice = ({ refreshData, searchTerm }) => {
     } catch (error) {
       console.error("Error deleting subdevice:", error);
     }
+  };
+
+  const handleEdit = (subDevice) => {
+    console.log("Click edit:", subDevice); // ⬅️ Tambahkan ini juga
+    onEditSubDevice(subDevice);
   };
 
   return (
@@ -127,7 +132,11 @@ const TableSubDevice = ({ refreshData, searchTerm }) => {
                     {subDevice.portsubdevice}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
-                    <button className="p-1 text-blue-600 hover:text-blue-800 transition-colors mr-2">
+                    <button
+                      className="p-1 text-blue-600 hover:text-blue-800 transition-colors mr-2"
+                      onClick={() => handleEdit(subDevice)}
+                      title="Edit sub device"
+                    >
                       <FaEdit />
                     </button>
                     <button

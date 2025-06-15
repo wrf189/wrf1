@@ -7,6 +7,7 @@ const useMod = () => {
     createDevice: false,
     updateDevice: false,
     createSubDevice: false,
+    updateSubDevice: false,
   });
   const [selectdItem, setSelectedItem] = useState(null);
 
@@ -23,6 +24,7 @@ const useMod = () => {
   return {
     modals,
     selectdItem,
+    setSelectedItem,
     handleOpenModal,
     handleCloseModal,
   };

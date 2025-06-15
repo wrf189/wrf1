@@ -66,6 +66,16 @@ export const getUplinkToOLT = async (req, res) => {
             uplink: true,
           },
         },
+        subDevices: {
+          select: {
+            id: true,
+            subdevicename: true,
+            hostname: true,
+            portsubdevice: true,
+            portdevice: true,
+            createdAt: true,
+          },
+        },
         status: true,
         createdAt: true,
       },

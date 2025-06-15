@@ -5,10 +5,17 @@ const prisma = new PrismaClient();
 // POST /sub-device
 export const createSubDevice = async (req, res) => {
   try {
-    const { subdevicename, hostname, portsubdevice, deviceId, portdevice } = req.body;
+    const { subdevicename, hostname, portsubdevice, deviceId, portdevice } =
+      req.body;
 
     // Validasi input
-    if (!subdevicename || !hostname || !portsubdevice || !deviceId || !portdevice) {
+    if (
+      !subdevicename ||
+      !hostname ||
+      !portsubdevice ||
+      !deviceId ||
+      !portdevice
+    ) {
       return res.status(400).json({ message: "Semua field wajib diisi" });
     }
 
@@ -18,7 +25,9 @@ export const createSubDevice = async (req, res) => {
     });
 
     if (!existingDevice) {
-      return res.status(404).json({ message: `Device dengan ID '${deviceId}' tidak ditemukan` });
+      return res
+        .status(404)
+        .json({ message: `Device dengan ID '${deviceId}' tidak ditemukan` });
     }
 
     // VALIDASI #1: Cek kombinasi deviceId + portdevice
@@ -105,6 +114,36 @@ export const getSubDevicesByDeviceId = async (req, res) => {
   } catch (error) {
     console.error("Get SubDevices By Device ID Error:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// PUT /sub-device/:id
+export const updateSubDevice = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { subdevicename, hostname, portsubdevice, deviceId, portdevice } =
+      req.body;
+
+    const subDevice = await prisma.sub_Device.findUnique({ where: { id: id } });
+    if (!subDevice) {
+      return res.status(404).json({ message: "Sub device tidak ditemukan" });
+    }
+
+    const updatedSubDevice = await prisma.sub_Device.update({
+      where: { id: id },
+      data: { subdevicename, hostname, portsubdevice, deviceId, portdevice },
+    });
+
+    res.status(200).json({
+      message: "Sub device berhasil diupdate",
+      data: updatedSubDevice,
+    });
+  } catch (error) {
+    console.error("Error saat mengupdate sub device:", error);
+    res.status(500).json({
+      message: "Terjadi kesalahan pada server",
+      error: error.message,
+    });
   }
 };
 
