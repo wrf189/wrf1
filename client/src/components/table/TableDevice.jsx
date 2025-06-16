@@ -138,7 +138,7 @@ const TableDevice = ({ refreshData, onDeleteDevice, onEditDevice, searchTerm = "
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                   No
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-[200px]">
                   Device
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
@@ -175,14 +175,14 @@ const TableDevice = ({ refreshData, onDeleteDevice, onEditDevice, searchTerm = "
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
+                    <td className="px-6 py-4 min-w-[200px] max-w-[250px]">
+                      <div className="flex items-start">
                         <div className="ml-0">
-                          <div className="text-sm font-semibold text-gray-900">
+                          <div className="text-sm font-semibold text-gray-900 break-words leading-relaxed">
                             {device.devicename || 'Unknown Device'}
                           </div>
                           {device.portdevicename && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 mt-1">
                               Port: {device.portdevicename}
                             </div>
                           )}
@@ -191,7 +191,7 @@ const TableDevice = ({ refreshData, onDeleteDevice, onEditDevice, searchTerm = "
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-600 font-medium">
-                        <span className={searchTerm && device.hostname?.toLowerCase().includes(searchTerm.toLowerCase()) 
+                        <span className={searchTerm && device.location?.toLowerCase().includes(searchTerm.toLowerCase()) 
                           ? "bg-yellow-200 px-1 rounded" : ""}>
                           {device.location || 'No location'}
                         </span>

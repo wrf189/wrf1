@@ -12,16 +12,28 @@ const CreateUserMod = ({ onClose, onCreated }) => {
     role: "user", // Set default value
   });
 
+  // State untuk error handling
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    
+    // Clear error when user starts typing
+    if (error) {
+      setError("");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(""); // Clear previous errors
+    
     const token = Cookies.get("token");
     
     try {
@@ -33,14 +45,50 @@ const CreateUserMod = ({ onClose, onCreated }) => {
       
       if (response.status === 201) {
         console.log("User created successfully");
+        // Show success message (optional)
+        // alert(response.data.message); // "User created successfully"
+        
         // Pass the new user data to the parent component
         onCreated(response.data.user);
         onClose();
       } else {
-        console.error("Failed to create user");
+        setError("Failed to create user. Please try again.");
       }
     } catch (error) {
       console.error("Error creating user:", error);
+      
+      // Handle different types of errors
+      if (error.response) {
+        // Server responded with error status
+        const statusCode = error.response.status;
+        const errorMessage = error.response.data?.message;
+        
+        switch (statusCode) {
+          case 400:
+            // Backend mengirim pesan spesifik untuk validation errors
+            setError(errorMessage || "Invalid data provided. Please check your input.");
+            break;
+          case 401:
+            setError("Unauthorized. Please login again.");
+            break;
+          case 403:
+            setError("You don't have permission to create users.");
+            break;
+          case 500:
+            setError(errorMessage || "Internal server error. Please try again later.");
+            break;
+          default:
+            setError(errorMessage || "An error occurred while creating user.");
+        }
+      } else if (error.request) {
+        // Network error
+        setError("Network error. Please check your internet connection.");
+      } else {
+        // Other errors
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -54,6 +102,14 @@ const CreateUserMod = ({ onClose, onCreated }) => {
             onClick={onClose}
           />
         </div>
+        
+        {/* Error Message Display */}
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+            <span className="block sm:inline">{error}</span>
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label htmlFor="name">Name</label>
@@ -66,6 +122,7 @@ const CreateUserMod = ({ onClose, onCreated }) => {
               onChange={handleChange}
               className="border border-gray-300 rounded-md p-2"
               required
+              disabled={isLoading}
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -79,6 +136,7 @@ const CreateUserMod = ({ onClose, onCreated }) => {
               onChange={handleChange}
               className="border border-gray-300 rounded-md p-2"
               required
+              disabled={isLoading}
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -92,6 +150,7 @@ const CreateUserMod = ({ onClose, onCreated }) => {
               onChange={handleChange}
               className="border border-gray-300 rounded-md p-2"
               required
+              disabled={isLoading}
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -103,6 +162,7 @@ const CreateUserMod = ({ onClose, onCreated }) => {
               value={formData.role}
               onChange={handleChange}
               required
+              disabled={isLoading}
             >
               <option value="">Select Role</option>
               <option value="admin">Admin</option>
@@ -111,9 +171,14 @@ const CreateUserMod = ({ onClose, onCreated }) => {
           </div>
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-800 text-white px-4 py-2 rounded-lg mt-3 cursor-pointer"
+            className={`${
+              isLoading 
+                ? "bg-gray-400 cursor-not-allowed" 
+                : "bg-blue-500 hover:bg-blue-800 cursor-pointer"
+            } text-white px-4 py-2 rounded-lg mt-3 transition-colors duration-200`}
+            disabled={isLoading}
           >
-            Submit
+            {isLoading ? "Creating..." : "Submit"}
           </button>
         </form>
       </div>

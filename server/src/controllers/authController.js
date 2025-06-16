@@ -13,7 +13,7 @@ export const register = async (req, res) => {
     if (!name || !email || !password) {
       return res
         .status(400)
-        .json({ message: "Name, email, dan password wajib diisi" });
+        .json({ message: "Name, email, and password are required" });
     }
 
     // Validasi password minimal 8 karakter, ada huruf besar, huruf kecil, angka, dan simbol
@@ -21,14 +21,14 @@ export const register = async (req, res) => {
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
         message:
-          "Password harus minimal 8 karakter dan terdiri dari huruf besar, huruf kecil, angka, dan simbol",
+          "Password must be at least 8 characters long and contain uppercase letters, lowercase letters, numbers, and symbols",
       });
     }
 
     // Cek apakah email sudah terdaftar
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({ message: "Email sudah terdaftar" });
+      return res.status(400).json({ message: "Email is already registered" });
     }
 
     // Hash password dan buat user baru
@@ -38,7 +38,7 @@ export const register = async (req, res) => {
     });
 
     res.status(201).json({
-      message: "User berhasil dibuat",
+      message: "User created successfully",
       user: {
         id: user.id,
         name: user.name,
@@ -48,9 +48,9 @@ export const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error saat register:", error);
+    console.error("Error during registration:", error);
     res.status(500).json({
-      message: "Terjadi kesalahan pada server",
+      message: "Internal server error",
       error: error.message,
     });
   }
@@ -88,13 +88,13 @@ export const login = async (req, res) => {
     );
 
     res.status(200).json({
-      message: "Login berhasil",
+      message: "Login successful",
       token,
     });
   } catch (error) {
-    console.error("Error saat login:", error);
+    console.error("Error during login:", error);
     res.status(500).json({
-      message: "Terjadi kesalahan pada server",
+      message: "Internal server error",
       error: error.message,
     });
   }
@@ -106,13 +106,13 @@ export const verifyToken = (req, res) => {
     const token = req.headers.authorization?.split(" ")[1];
 
     if (!token) {
-      return res.status(401).json({ message: "Token tidak ditemukan" });
+      return res.status(401).json({ message: "Token not found" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     res.status(200).json({
-      message: "Token valid",
+      message: "Token is valid",
       user: {
         id: decoded.id,
         name: decoded.name,
@@ -123,12 +123,12 @@ export const verifyToken = (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error saat verifikasi token:", error);
+    console.error("Error during token verification:", error);
 
     if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ message: "Token kadaluarsa" });
+      return res.status(401).json({ message: "Token has expired" });
     }
 
-    res.status(401).json({ message: "Token tidak valid" });
+    res.status(401).json({ message: "Invalid token" });
   }
 };
