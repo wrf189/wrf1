@@ -9,6 +9,7 @@ const TopologiPage = () => {
   const [uplinkList, setUplinkList] = useState([]);
   const [selectedUplink, setSelectedUplink] = useState("");
   const [topologyData, setTopologyData] = useState(null);
+  const [oltReference, setOltReference] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingTopology, setLoadingTopology] = useState(false);
   const [error, setError] = useState(null);
@@ -36,30 +37,60 @@ const TopologiPage = () => {
     setLoadingTopology(true);
     setError(null);
     const token = Cookies.get("token");
+
     try {
-      const response = await axios.get(
+      // 1. Hit internal API untuk topologi
+      const topoRes = await axios.get(
         `${API_URL}/topologi/uplink-to-olt?uplink=${uplink}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log("Topology data response:", topoRes.data);
+      setTopologyData({
+        uplink: topoRes.data.uplink,
+        data: topoRes.data.devices,
+      });
+
+      // 2. Login ke API eksternal (NISA)
+      const formData = new FormData();
+      formData.append("username", "wangsa.fatahillah");
+      formData.append("password", "e0c9fcfd8400dd6898379e977292047b");
+
+      const loginRes = await axios.post(
+        "https://apicore.oss.myrepublic.co.id/authenticate/login",
+        formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-      console.log("Topology data response:", response.data);
-      // Mengubah format data sesuai dengan yang diharapkan oleh TopologyGraphComponent
-      setTopologyData({
-        uplink: response.data.uplink,
-        data: response.data.devices, // Menggunakan 'device' bukan 'data'
-      });
-    } catch (error) {
-      console.error("Error fetching topology data:", error);
-      setError("Failed to fetch topology data");
+
+      const externalToken = loginRes.data?.data?.access_token;
+      console.log("External API login token:", externalToken);
+
+      if (!externalToken) {
+        throw new Error("Token dari login NISA tidak ditemukan");
+      }
+
+      // 3. Hit data OLT dari API NISA
+      const refRes = await axios.get(
+        "https://apinisa.oss.myrepublic.co.id/api/referential/datalink/olt",
+        {
+          headers: {
+            Authorization: `Bearer ${externalToken}`,
+          },
+        }
+      );
+
+      setOltReference(refRes.data || []);
+    } catch (err) {
+      console.error("Error fetching topology or external OLT data:", err);
+      setError("Gagal mengambil data topologi atau OLT referensial");
       setTopologyData(null);
     } finally {
       setLoadingTopology(false);
     }
   };
-
   useEffect(() => {
     getUplinks();
   }, []);
@@ -77,11 +108,13 @@ const TopologiPage = () => {
         <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
           <h3 className="text-sm font-semibold text-gray-800">Legend</h3>
         </div>
-        
+
         <div className="p-4 space-y-4">
           {/* Node Legend */}
           <div>
-            <h4 className="text-xs font-medium mb-2 text-gray-600 uppercase tracking-wide">Nodes</h4>
+            <h4 className="text-xs font-medium mb-2 text-gray-600 uppercase tracking-wide">
+              Nodes
+            </h4>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
@@ -104,7 +137,9 @@ const TopologiPage = () => {
 
           {/* Edge Legend */}
           <div>
-            <h4 className="text-xs font-medium mb-2 text-gray-600 uppercase tracking-wide">Connections</h4>
+            <h4 className="text-xs font-medium mb-2 text-gray-600 uppercase tracking-wide">
+              Connections
+            </h4>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-0.5 bg-gray-600 rounded-full"></div>
@@ -130,7 +165,9 @@ const TopologiPage = () => {
             <RiGitForkFill className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Network Topology</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Network Topology
+            </h1>
           </div>
         </div>
       </div>
@@ -143,11 +180,15 @@ const TopologiPage = () => {
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
               <div className="flex items-center gap-4">
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Topology View</h2>
-                  <p className="text-sm text-gray-600">Select an uplink to view network topology</p>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Topology View
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    Select an uplink to view network topology
+                  </p>
                 </div>
               </div>
-              
+
               {/* Uplink Selector */}
               <div className="flex items-center gap-4">
                 <div className="relative">
@@ -173,21 +214,31 @@ const TopologiPage = () => {
                       ))}
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
                     </svg>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             {/* Status Messages */}
             {error && (
               <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-600 text-sm">{error}</p>
               </div>
             )}
-            
+
             {loading && (
               <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-blue-600 text-sm">Loading uplinks...</p>
@@ -209,25 +260,33 @@ const TopologiPage = () => {
                 <div className="flex-shrink-0 px-6 py-4 border-b border-gray-100 bg-gray-50">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      {selectedUplink ? `Topology: ${selectedUplink}` : 'Network Topology'}
+                      {selectedUplink
+                        ? `Topology: ${selectedUplink}`
+                        : "Network Topology"}
                     </h3>
                     {loadingTopology && (
                       <div className="flex items-center gap-2">
                         <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-sm text-gray-600">Loading...</span>
+                        <span className="text-sm text-gray-600">
+                          Loading...
+                        </span>
                       </div>
                     )}
                   </div>
                 </div>
-                
+
                 {/* Graph Content */}
                 <div className="flex-1 p-6 overflow-hidden">
                   {loadingTopology ? (
                     <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-xl">
                       <div className="text-center">
                         <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                        <p className="text-gray-500 font-medium">Loading topology data...</p>
-                        <p className="text-gray-400 text-sm mt-1">Please wait while we fetch the network topology</p>
+                        <p className="text-gray-500 font-medium">
+                          Loading topology data...
+                        </p>
+                        <p className="text-gray-400 text-sm mt-1">
+                          Please wait while we fetch the network topology
+                        </p>
                       </div>
                     </div>
                   ) : selectedUplink &&
@@ -238,6 +297,7 @@ const TopologiPage = () => {
                       <TopologyGraphComponent
                         uplink={topologyData.uplink}
                         data={topologyData.data}
+                        oltReference={oltReference}
                       />
                     </div>
                   ) : (
@@ -247,12 +307,14 @@ const TopologiPage = () => {
                           <RiGitForkFill className="w-8 h-8 text-gray-400" />
                         </div>
                         <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                          {selectedUplink ? 'No Topology Data' : 'Select an Uplink'}
+                          {selectedUplink
+                            ? "No Topology Data"
+                            : "Select an Uplink"}
                         </h4>
                         <p className="text-gray-500">
                           {selectedUplink
-                            ? 'No topology data available for the selected uplink'
-                            : 'Choose an uplink from the dropdown to visualize the network topology'}
+                            ? "No topology data available for the selected uplink"
+                            : "Choose an uplink from the dropdown to visualize the network topology"}
                         </p>
                       </div>
                     </div>

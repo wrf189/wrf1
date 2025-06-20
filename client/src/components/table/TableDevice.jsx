@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
-import { RiComputerLine, RiDeleteBinLine, RiEditLine, RiEyeLine } from "react-icons/ri";
+import { RiComputerLine, RiDeleteBinLine, RiEditLine, RiEyeLine, RiAddLine } from "react-icons/ri";
 import axios from "axios";
 import { API_URL } from "../../utils/constantApi";
 import Cookies from "js-cookie";
@@ -243,7 +243,7 @@ const TableDevice = ({ refreshData, onDeleteDevice, onEditDevice, searchTerm = "
                             className="inline-flex items-center p-2 text-green-600 hover:text-white hover:bg-green-600 rounded-lg transition-all duration-200 hover:shadow-md transform hover:scale-105"
                             title="View device"
                           >
-                            <RiEyeLine className="w-4 h-4" />
+                            <RiAddLine className="w-4 h-4" />
                           </button>
                         </a>
                         <button
