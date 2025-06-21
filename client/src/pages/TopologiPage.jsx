@@ -33,64 +33,35 @@ const TopologiPage = () => {
   };
 
   const fetchTopology = async (uplink) => {
-    if (!uplink) return;
-    setLoadingTopology(true);
-    setError(null);
-    const token = Cookies.get("token");
+  if (!uplink) return;
+  setLoadingTopology(true);
+  setError(null);
+  const token = Cookies.get("token");
 
-    try {
-      // 1. Hit internal API untuk topologi
-      const topoRes = await axios.get(
-        `${API_URL}/topologi/uplink-to-olt?uplink=${uplink}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log("Topology data response:", topoRes.data);
-      setTopologyData({
-        uplink: topoRes.data.uplink,
-        data: topoRes.data.devices,
-      });
+  try {
+    // 1. Ambil data topologi internal
+    const topoRes = await axios.get(
+      `${API_URL}/topologi/uplink-to-olt?uplink=${uplink}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    console.log("Topology data response:", topoRes.data);
+    setTopologyData({
+      uplink: topoRes.data.uplink,
+      data: topoRes.data.devices,
+    });
 
-      // 2. Login ke API eksternal (NISA)
-      const formData = new FormData();
-      formData.append("username", "wangsa.fatahillah");
-      formData.append("password", "e0c9fcfd8400dd6898379e977292047b");
+    // 2. Ambil OLT referensi dari API eksternal via proxy
+    const refRes = await axios.get(`${API_URL}/proxy/olt-monitoring`);
+    setOltReference(refRes.data || []);
+  } catch (err) {
+    console.error("Error fetching topology or OLT reference via proxy:", err);
+    setError("Error fetching topology or OLT reference via API NISA");
+    setTopologyData(null);
+  } finally {
+    setLoadingTopology(false);
+  }
+};
 
-      const loginRes = await axios.post(
-        "https://apicore.oss.myrepublic.co.id/authenticate/login",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      const externalToken = loginRes.data?.data?.access_token;
-      console.log("External API login token:", externalToken);
-
-      if (!externalToken) {
-        throw new Error("Token dari login NISA tidak ditemukan");
-      }
-
-      // 3. Hit data OLT dari API NISA
-      const refRes = await axios.get(
-        "https://apinisa.oss.myrepublic.co.id/api/referential/datalink/olt",
-        {
-          headers: {
-            Authorization: `Bearer ${externalToken}`,
-          },
-        }
-      );
-
-      setOltReference(refRes.data || []);
-    } catch (err) {
-      console.error("Error fetching topology or external OLT data:", err);
-      setError("Gagal mengambil data topologi atau OLT referensial");
-      setTopologyData(null);
-    } finally {
-      setLoadingTopology(false);
-    }
-  };
   useEffect(() => {
     getUplinks();
   }, []);

@@ -6,7 +6,7 @@ import useMod from "../hooks/useMod";
 import CreateDeviceMod from "../mods/CreateDeviceMod";
 import UpdateDeviceMod from "../mods/UpdateDeviceMod";
 import CreateSubDeviceMod from "../mods/CreateSubDeviceMod";
-import UpdateSubDeviceMod from "../mods/UpdateSubDeviceMod"; // Import yang kurang
+import UpdateSubDeviceMod from "../mods/UpdateSubDeviceMod";
 
 const DevicesPage = () => {
   const { modals, handleOpenModal, handleCloseModal } = useMod();
@@ -15,6 +15,7 @@ const DevicesPage = () => {
   const [refreshData, setRefreshData] = useState(false);
   const [refreshSubData, setRefreshSubData] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedDeviceId, setSelectedDeviceId] = useState(null); // Tambahkan state untuk device ID
   const [searchTerm, setSearchTerm] = useState("");
   const [subSearchTerm, setSubSearchTerm] = useState("");
 
@@ -52,17 +53,17 @@ const DevicesPage = () => {
     handleCloseModal("createSubDevice");
   };
 
-  const handleCreateSubDevice = () => {
+  // Update fungsi ini untuk menerima deviceId
+  const handleCreateSubDevice = (deviceId) => {
+    setSelectedDeviceId(deviceId); // Set device ID yang dipilih
     handleOpenModal("createSubDevice");
   };
 
-  // Tambahkan fungsi untuk handle edit sub device
   const handleEditSubDevice = (subDevice) => {
     setSelectedItem(subDevice);
     handleOpenModal("updateSubDevice");
   };
 
-  // Tambahkan fungsi untuk handle update sub device
   const handleUpdateSubDevice = (updatedSubDevice) => {
     setSubDevices((prevSubDevices) =>
       prevSubDevices.map((subDevice) =>
@@ -131,7 +132,7 @@ const DevicesPage = () => {
                 refreshData={refreshData}
                 onDeleteDevice={handleDeleteDevice}
                 onEditDevice={handleEditDevice}
-                onCreateSubDevice={handleCreateSubDevice}
+                onCreateSubDevice={handleCreateSubDevice} // Pass fungsi yang sudah diupdate
                 searchTerm={searchTerm}
               />
             </div>
@@ -196,10 +197,10 @@ const DevicesPage = () => {
         <CreateSubDeviceMod
           onClose={() => handleCloseModal("createSubDevice")}
           onCreated={handleAddSubDevice}
+          id={selectedDeviceId} // Pass device ID ke modal
         />
       )}
 
-      {/* Tambahkan modal untuk update sub device */}
       {modals.updateSubDevice && selectedItem && (
         <UpdateSubDeviceMod
           onClose={() => handleCloseModal("updateSubDevice")}

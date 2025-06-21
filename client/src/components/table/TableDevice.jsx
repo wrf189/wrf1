@@ -5,7 +5,7 @@ import axios from "axios";
 import { API_URL } from "../../utils/constantApi";
 import Cookies from "js-cookie";
 
-const TableDevice = ({ refreshData, onDeleteDevice, onEditDevice, searchTerm = "" }) => {
+const TableDevice = ({ refreshData, onDeleteDevice, onEditDevice, onCreateSubDevice, searchTerm = "" }) => {
   const [deviceList, setDeviceList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filteredDevices, setFilteredDevices] = useState([]);
@@ -75,6 +75,13 @@ const TableDevice = ({ refreshData, onDeleteDevice, onEditDevice, searchTerm = "
 
   const handleEdit = (device) => {
     onEditDevice(device);
+  };
+
+  // Update fungsi ini untuk mengirim device ID
+  const handleCreateSub = (deviceId) => {
+    if (onCreateSubDevice) {
+      onCreateSubDevice(deviceId); // Kirim device ID ke parent
+    }
   };
 
   const getStatusBadgeClass = (status) => {
@@ -238,14 +245,13 @@ const TableDevice = ({ refreshData, onDeleteDevice, onEditDevice, searchTerm = "
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div className="flex justify-center items-center space-x-2">
-                        <a href={`/dashboard/device/${device.id}`}>
-                          <button
-                            className="inline-flex items-center p-2 text-green-600 hover:text-white hover:bg-green-600 rounded-lg transition-all duration-200 hover:shadow-md transform hover:scale-105"
-                            title="View device"
-                          >
-                            <RiAddLine className="w-4 h-4" />
-                          </button>
-                        </a>
+                        <button
+                          className="inline-flex items-center p-2 text-green-600 hover:text-white hover:bg-green-600 rounded-lg transition-all duration-200 hover:shadow-md transform hover:scale-105"
+                          onClick={() => handleCreateSub(device.id)} // Kirim device.id
+                          title="Add Sub Device"
+                        >
+                          <RiAddLine className="w-4 h-4" />
+                        </button>
                         <button
                           className="inline-flex items-center p-2 text-blue-600 hover:text-white hover:bg-blue-600 rounded-lg transition-all duration-200 hover:shadow-md transform hover:scale-105"
                           onClick={() => handleEdit(device)}

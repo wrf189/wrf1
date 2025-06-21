@@ -69,7 +69,7 @@ const CreateSubDeviceMod = ({ onClose, onCreated, id }) => {
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <label htmlFor="deviceId">Device ID</label>
+            <label htmlFor="deviceId">Main Device ID</label>
             <input
               type="text"
               id="deviceId"
@@ -81,12 +81,12 @@ const CreateSubDeviceMod = ({ onClose, onCreated, id }) => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="hostname">Hostname</label>
+            <label htmlFor="portdevice">Port Main Device</label>
             <input
               type="text"
-              id="hostname"
-              name="hostname"
-              value={formData.hostname}
+              id="portdevice"
+              name="portdevice"
+              value={formData.portdevice}
               onChange={handleChange}
               className="border border-gray-300 rounded-md p-2"
               required
@@ -94,12 +94,12 @@ const CreateSubDeviceMod = ({ onClose, onCreated, id }) => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label htmlFor="portdevice">Port Device</label>
+            <label htmlFor="hostname">Sub Device Hostname</label>
             <input
               type="text"
-              id="portdevice"
-              name="portdevice"
-              value={formData.portdevice}
+              id="hostname"
+              name="hostname"
+              value={formData.hostname}
               onChange={handleChange}
               className="border border-gray-300 rounded-md p-2"
               required
