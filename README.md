@@ -9,7 +9,7 @@ Sistem berbasis web untuk **visualisasi topologi jaringan OLT**, **monitoring tr
 - Monitoring utilisasi bandwidth uplink dari perangkat OLT melalui API eksternal (NISA)
 - Deteksi kondisi perangkat: congestion, redundancy, dan status online/offline
 - Manajemen perangkat melalui antarmuka Admin Panel
-- Role-based authentication (Admin & Viewer)
+- Role-based authentication (Admin & User)
 
 ---
 
